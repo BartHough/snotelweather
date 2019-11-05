@@ -164,7 +164,7 @@ export class MapContainer extends Component {
           <Marker position={this.state.latlng} />
           <form onSubmit={this.callAPI}>
             <br></br>
-            <label style={style.form}>Days To View</label>
+            <label style={style.form}>Days To View:</label>
             <br></br>
             <input
               style={style.form}

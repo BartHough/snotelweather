@@ -38,6 +38,7 @@ export class MapContainer extends Component {
         lat: 41,
         lng: -108.3
       },
+      isVisible: false,
       days: "",
       stationName: "",
       distance: "",
@@ -125,6 +126,7 @@ export class MapContainer extends Component {
       dates.push(day["Date"]);
       // const 
     })
+    const isVisible = true;
     this.setState({
       ...this.state,
       stationName,
@@ -137,7 +139,8 @@ export class MapContainer extends Component {
       snowDepth,
       swe,
       temp,
-      dates
+      dates,
+      isVisible
     })
   }
   addMarker(location, map) {
@@ -176,6 +179,7 @@ export class MapContainer extends Component {
             <input style={style.form} value="Submit" type="submit" />
             <br></br>
           </form>
+          {this.state.isVisible && 
           <SnotelSite
             stationName={this.state.stationName}
             distance={this.state.distance}
@@ -183,7 +187,7 @@ export class MapContainer extends Component {
             snowDepth={this.state.snowDepth}
             swe={this.state.swe}
             temp={this.state.temp}
-          />
+          />}
         </Map>
       </div>
     );

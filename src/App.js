@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Synth from './components/Synth'
+import MapContainer from './components/MapContainer'
 import './App.css';
 
 class App extends Component {
@@ -7,7 +7,7 @@ class App extends Component {
 
     return (
       <div>
-          <Synth />
+          <MapContainer />
       </div>
 
     );

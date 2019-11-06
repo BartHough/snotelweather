@@ -4,7 +4,6 @@ import SnotelSite from './SnotelSite';
 import Description from './Description';
 import { GoogleApiKey } from '../APIKeys';
 import '../styles/MapContainer.css'
-
 const apiKey = GoogleApiKey
 
 const style = {
@@ -113,7 +112,6 @@ export class MapContainer extends Component {
       swe.push(day['Snow Water Equivalent (in)']);
       temp.push(day['Observed Air Temperature (degrees farenheit)']);
       dates.push(day['Date']);
-      // const 
     })
     const isVisible = true;
     this.setState({

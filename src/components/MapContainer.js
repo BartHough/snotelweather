@@ -3,8 +3,12 @@ import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
 import SnotelSite from './SnotelSite';
 import Description from './Description';
 import '../styles/MapContainer.css'
+<<<<<<< HEAD
 
 const apiKey = process.env.REACT_APP_GOOGLE_API_KEY
+=======
+const apiKey = GoogleApiKey
+>>>>>>> f933ca1bb12e10e21b2aa4136611ca7fe45aa8d5
 
 const style = {
   map: {
@@ -112,7 +116,6 @@ export class MapContainer extends Component {
       swe.push(day['Snow Water Equivalent (in)']);
       temp.push(day['Observed Air Temperature (degrees farenheit)']);
       dates.push(day['Date']);
-      // const 
     })
     const isVisible = true;
     this.setState({

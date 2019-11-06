@@ -1,0 +1,13 @@
+
+.textContainer{
+    text-align: center;
+}
+
+input::placeholder {
+    text-align: center;
+  }
+
+.chartContainer{
+    width: 100%;
+    height: 30%
+}

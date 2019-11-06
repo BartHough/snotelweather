@@ -3,6 +3,8 @@ import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
 import SnotelSite from './SnotelSite';
 import Description from './Description';
 import { GoogleApiKey } from '../APIKeys';
+import '../styles/MapContainer.css'
+
 const apiKey = GoogleApiKey
 
 const style = {
@@ -14,18 +16,6 @@ const style = {
     top: '10px',
     margin: 'auto'
   },
-  form: {
-    display: 'flex',
-    justifyContent: 'center',
-    margin: 'auto',
-    alignItems: 'center'
-  },
-  select: {
-    control: () => ({
-      // none of react-select's styles are passed to <Control />
-      width: 50
-    })
-  }
 }
 
 
@@ -39,14 +29,14 @@ export class MapContainer extends Component {
         lng: -108.3
       },
       isVisible: false,
-      days: "",
-      stationName: "",
-      distance: "",
-      elevation: "",
-      triplet: "",
-      wind: "",
-      stationLat: "",
-      stationLng: "",
+      days: '',
+      stationName: '',
+      distance: '',
+      elevation: '',
+      triplet: '',
+      wind: '',
+      stationLat: '',
+      stationLng: '',
       snowDepth: [],
       swe: [],
       temp: [],
@@ -73,7 +63,6 @@ export class MapContainer extends Component {
         lng
       }
     }));
-    // this.updateFields(lat, lng)
   }
 
   // Adapted from answer posted by github user Mostafasaffari: https://github.com/fullstackreact/google-maps-react/issues/192
@@ -98,7 +87,7 @@ export class MapContainer extends Component {
     event.preventDefault();
     const proxy = 'https://floating-fjord-45481.herokuapp.com/'
     const query = `http://api.powderlin.es/closest_stations?lat=${encodeURIComponent(this.state.latlng.lat)}&lng=${encodeURIComponent(this.state.latlng.lng)}&data=true&days=${encodeURIComponent(this.state.days)}&count=1`;
-    console.log("calling http for url: " + query);
+    console.log('calling http for url: ' + query);
     fetch(proxy + query)
       .then(res => res.json())
       .then(data => {
@@ -108,22 +97,22 @@ export class MapContainer extends Component {
       });
   }
   extractInformation(data) {
-    const stationName = data[0]["station_information"]["name"];
-    const distance = Math.round(data[0]["distance"]);
-    const elevation = data[0]["station_information"]["elevation"];
-    const triplet = data[0]["station_information"]["triplet"]
-    const wind = data[0]["station_information"]["wind"]
-    const stationLat = data[0]["station_information"]["location"]["lat"]
-    const stationLng = data[0]["station_information"]["location"]["lng"]
+    const stationName = data[0]['station_information']['name'];
+    const distance = Math.round(data[0]['distance']);
+    const elevation = data[0]['station_information']['elevation'];
+    const triplet = data[0]['station_information']['triplet']
+    const wind = data[0]['station_information']['wind']
+    const stationLat = data[0]['station_information']['location']['lat']
+    const stationLng = data[0]['station_information']['location']['lng']
     let snowDepth = []
     let swe = []
     let temp = []
     let dates = []
-    data[0]["data"].forEach(day => {
-      snowDepth.push(day["Snow Depth (in)"]);
-      swe.push(day["Snow Water Equivalent (in)"]);
-      temp.push(day["Observed Air Temperature (degrees farenheit)"]);
-      dates.push(day["Date"]);
+    data[0]['data'].forEach(day => {
+      snowDepth.push(day['Snow Depth (in)']);
+      swe.push(day['Snow Water Equivalent (in)']);
+      temp.push(day['Observed Air Temperature (degrees farenheit)']);
+      dates.push(day['Date']);
       // const 
     })
     const isVisible = true;
@@ -162,21 +151,20 @@ export class MapContainer extends Component {
           onClick={(t, map, c) => this.addMarker(c.latLng, map)}
         >
           <Marker position={this.state.latlng} />
-          <form onSubmit={this.callAPI}>
+          <form className='form' onSubmit={this.callAPI}>
             <br></br>
-            <label style={style.form}>Days To View:</label>
+            <label>Days To View:</label>
             <br></br>
             <input
-              style={style.form}
-              placeholder="Days"
-              name="days"
-              type="number"
+              placeholder='Days'
+              name='days'
+              type='number'
               value={this.state.days}
               onChange={this.handleChange}
               required
             />
             <br></br>
-            <input style={style.form} value="Submit" type="submit" />
+            <input className='submit' value='Submit' type='submit' />
             <br></br>
           </form>
           {this.state.isVisible && 

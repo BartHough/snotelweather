@@ -2,10 +2,9 @@ import React, { Component } from 'react';
 import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
 import SnotelSite from './SnotelSite';
 import Description from './Description';
-import { GoogleApiKey } from '../APIKeys';
 import '../styles/MapContainer.css'
 
-const apiKey = GoogleApiKey
+const apiKey = process.env.REACT_APP_GOOGLE_API_KEY
 
 const style = {
   map: {

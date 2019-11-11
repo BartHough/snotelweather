@@ -5,7 +5,7 @@ import Description from './Description';
 import '../styles/MapContainer.css'
 
 const apiKey = process.env.REACT_APP_GOOGLE_API_KEY
-
+const proxyUrl = process.env.REACT_APP_SNOTEL_PROXY
 const style = {
   map: {
     width: '100%',
@@ -84,14 +84,11 @@ export class MapContainer extends Component {
   }
   callAPI = (event) => {
     event.preventDefault();
-    const proxy = 'https://floating-fjord-45481.herokuapp.com/'
+    const proxy = proxyUrl;
     const query = `http://api.powderlin.es/closest_stations?lat=${encodeURIComponent(this.state.latlng.lat)}&lng=${encodeURIComponent(this.state.latlng.lng)}&data=true&days=${encodeURIComponent(this.state.days)}&count=1`;
-    console.log('calling http for url: ' + query);
     fetch(proxy + query)
       .then(res => res.json())
       .then(data => {
-        // this.setState({ ...this.state, items: item })
-        console.log(data)
         this.extractInformation(data);
       });
   }

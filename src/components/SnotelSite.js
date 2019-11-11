@@ -94,6 +94,17 @@ export class SnotelSite extends Component {
       ]
     };
   }
+  endRef = React.createRef()
+
+  componentDidMount () {
+    this.scrollToBottom()
+  }
+  componentDidUpdate () {
+    this.scrollToBottom()
+  }
+  scrollToBottom = () => {
+    this.endRef.current.scrollIntoView({ behavior: 'smooth' })
+  }
   render() {
     return (
       < div >
@@ -105,7 +116,7 @@ export class SnotelSite extends Component {
             Distance from Marker: {this.props.distance} miles
           </h4>
         </div>
-        <div className='chartContainer'>
+        <div className='chartContainer' ref={this.endRef}>
           <Line
             data={this.getHeight()}
             width={400}

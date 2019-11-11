@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
+import Loader from 'react-loader-spinner';
 import SnotelSite from './SnotelSite';
 import Description from './Description';
 import '../styles/MapContainer.css'
@@ -28,6 +29,7 @@ export class MapContainer extends Component {
         lng: -108.3
       },
       isVisible: false,
+      loading: false,
       days: '',
       stationName: '',
       distance: '',
@@ -83,6 +85,10 @@ export class MapContainer extends Component {
     };
   }
   callAPI = (event) => {
+    this.setState({
+      ...this.state,
+      loading: true
+    })
     event.preventDefault();
     const proxy = proxyUrl;
     const query = `http://api.powderlin.es/closest_stations?lat=${encodeURIComponent(this.state.latlng.lat)}&lng=${encodeURIComponent(this.state.latlng.lng)}&data=true&days=${encodeURIComponent(this.state.days)}&count=1`;
@@ -111,6 +117,7 @@ export class MapContainer extends Component {
       dates.push(day['Date']);
     })
     const isVisible = true;
+    const loading = false;
     this.setState({
       ...this.state,
       stationName,
@@ -124,7 +131,8 @@ export class MapContainer extends Component {
       swe,
       temp,
       dates,
-      isVisible
+      isVisible,
+      loading
     })
   }
   addMarker(location, map) {
@@ -132,10 +140,19 @@ export class MapContainer extends Component {
     map.panTo(location);
   };
 
+  topRef = React.createRef()
+
+  componentDidMount () {
+    this.viewTop()
+  }
+  viewTop = () => {
+    this.topRef.current.scrollIntoView({ behavior: 'smooth' })
+  }
+
 
   render() {
     return (
-      <div>
+      <div ref={this.topRef}>
         <Description />
         <Map
           google={this.props.google}
@@ -162,15 +179,27 @@ export class MapContainer extends Component {
             <input className='submit' value='Submit' type='submit' />
             <br></br>
           </form>
-          {this.state.isVisible && 
-          <SnotelSite
-            stationName={this.state.stationName}
-            distance={this.state.distance}
-            dates={this.state.dates}
-            snowDepth={this.state.snowDepth}
-            swe={this.state.swe}
-            temp={this.state.temp}
-          />}
+          <div className='loader'>
+            {
+              this.state.loading &&
+              !this.state.isVisible &&
+              <Loader
+                type='Circles'
+                color='#4bc0c0'
+                height={80}
+                width={80}
+              />
+            }
+          </div>
+          {this.state.isVisible &&
+            <SnotelSite
+              stationName={this.state.stationName}
+              distance={this.state.distance}
+              dates={this.state.dates}
+              snowDepth={this.state.snowDepth}
+              swe={this.state.swe}
+              temp={this.state.temp}
+            />}
         </Map>
       </div>
     );

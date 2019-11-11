@@ -1,4 +1,4 @@
-[View Site Here](https://d3sfuzup97yohf.cloudfront.net/index.html)
+[View Site Here](https://www.snotelweather.com)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

@@ -7,6 +7,8 @@ import '../styles/MapContainer.css'
 
 const apiKey = process.env.REACT_APP_GOOGLE_API_KEY
 const proxyUrl = process.env.REACT_APP_SNOTEL_PROXY
+const apiGatewayUrl = process.env.REACT_APP_SNOTEL_API
+
 const style = {
   map: {
     width: '100%',
@@ -38,10 +40,14 @@ export class MapContainer extends Component {
       wind: '',
       stationLat: '',
       stationLng: '',
-      snowDepth: [],
-      swe: [],
-      temp: [],
-      dates: []
+      tobsLabels: [],
+      tobsData: [],
+      precLabels: [],
+      precData: [],
+      snwdLabels: [],
+      snwdData: [],
+      wteqLabels: [],
+      wteqData: []
     }
     this.handleChange = this.handleChange.bind(this)
 
@@ -91,7 +97,7 @@ export class MapContainer extends Component {
     })
     event.preventDefault();
     const proxy = proxyUrl;
-    const query = `http://api.powderlin.es/closest_stations?lat=${encodeURIComponent(this.state.latlng.lat)}&lng=${encodeURIComponent(this.state.latlng.lng)}&data=true&days=${encodeURIComponent(this.state.days)}&count=1`;
+    const query = `http://api.powderlin.es/closest_stations?lat=${encodeURIComponent(this.state.latlng.lat)}&lng=${encodeURIComponent(this.state.latlng.lng)}&data=false&days=1&count=1`;
     fetch(proxy + query)
       .then(res => res.json())
       .then(data => {
@@ -106,16 +112,9 @@ export class MapContainer extends Component {
     const wind = data[0]['station_information']['wind']
     const stationLat = data[0]['station_information']['location']['lat']
     const stationLng = data[0]['station_information']['location']['lng']
-    let snowDepth = []
-    let swe = []
-    let temp = []
-    let dates = []
-    data[0]['data'].forEach(day => {
-      snowDepth.push(day['Snow Depth (in)']);
-      swe.push(day['Snow Water Equivalent (in)']);
-      temp.push(day['Observed Air Temperature (degrees farenheit)']);
-      dates.push(day['Date']);
-    })
+    const apiUrl = apiGatewayUrl + '?' + 'snotel=' + triplet + '&days=' + this.state.days
+    console.log(apiUrl)
+    this.callApiGateway(apiUrl);
     const isVisible = true;
     const loading = false;
     this.setState({
@@ -127,13 +126,39 @@ export class MapContainer extends Component {
       wind,
       stationLat,
       stationLng,
-      snowDepth,
-      swe,
-      temp,
-      dates,
       isVisible,
       loading
     })
+  }
+  callApiGateway(apiUrl) {
+    // data comes in this order:
+    // # TOBS = AIR TEMPERATURE OBSERVED
+    // # PREC = PRECIPITATION ACCUMULATION
+    // # SNWD = SNOW DEPTH
+    // # WTEQ = SNOW WATER EQUIVALENT
+    fetch(apiUrl)
+      .then(res => res.json())
+      .then(apiData => {
+        let tobsLabels = apiData[0][0]
+        let tobsData = apiData[0][1]
+        let precLabels = apiData[1][0]
+        let precData = apiData[1][1]
+        let snwdLabels = apiData[2][0]
+        let snwdData = apiData[2][1]
+        let wteqLabels = apiData[3][0]
+        let wteqData = apiData[3][1]
+        this.setState({
+          ...this.state,
+          tobsLabels,
+          tobsData,
+          precLabels,
+          precData,
+          snwdLabels,
+          snwdData,
+          wteqLabels,
+          wteqData,
+        })
+      })
   }
   addMarker(location, map) {
     this.setState({ ...this.state, latlng: { lat: location.lat(), lng: location.lng() } })
@@ -142,7 +167,7 @@ export class MapContainer extends Component {
 
   topRef = React.createRef()
 
-  componentDidMount () {
+  componentDidMount() {
     this.viewTop()
   }
   viewTop = () => {
@@ -195,10 +220,14 @@ export class MapContainer extends Component {
             <SnotelSite
               stationName={this.state.stationName}
               distance={this.state.distance}
-              dates={this.state.dates}
-              snowDepth={this.state.snowDepth}
-              swe={this.state.swe}
-              temp={this.state.temp}
+              tobsLabels={this.state.tobsLabels}
+              tobsData={this.state.tobsData}
+              precLabels={this.state.precLabels}
+              precData={this.state.precData}
+              snwdLabels={this.state.snwdLabels}
+              snwdData={this.state.snwdData}
+              wteqLabels={this.state.wteqLabels}
+              wteqData={this.state.wteqData}
             />}
         </Map>
       </div>

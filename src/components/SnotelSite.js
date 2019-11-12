@@ -1,14 +1,10 @@
 import React, { Component } from 'react';
-import { Line } from 'react-chartjs-2';
-import '../styles/SnotelSite.css'
+import ChartWrapper from './ChartWrapper';
+import '../styles/SnotelSite.css';
 
 export class SnotelSite extends Component {
   constructor(props) {
     super(props);
-    this.getHeight = this.getHeight.bind(this);
-    this.getSwe = this.getSwe.bind(this);
-    this.getTemp = this.getTemp.bind(this);
-
   }
   getHeight() {
     return {
@@ -96,7 +92,7 @@ export class SnotelSite extends Component {
   }
   scrollRef = React.createRef()
 
-  componentDidMount () {
+  componentDidMount() {
     this.scrollToBottom()
   }
   scrollToBottom = () => {
@@ -113,33 +109,26 @@ export class SnotelSite extends Component {
             Distance from Marker: {this.props.distance} miles
           </h4>
         </div>
-        <div className='chartContainer'>
-          <Line
-            data={this.getHeight()}
-            width={400}
-            height={400}
-            options={{ maintainAspectRatio: false }}
-            responsive={true}
-          />
-        </div>
-        <div className='chartContainer'>
-          <Line
-            data={this.getSwe()}
-            width={400}
-            height={400}
-            options={{ maintainAspectRatio: false }}
-            responsive={true}
-          />
-        </div>
-        <div className='chartContainer'>
-          <Line
-            data={this.getTemp()}
-            width={400}
-            height={400}
-            options={{ maintainAspectRatio: false }}
-            responsive={true}
-          />
-        </div>
+        <ChartWrapper
+          title='Observed Air Temperature (F)'
+          data={this.props.tobsData}
+          labels={this.props.tobsLabels}
+        />
+        <ChartWrapper
+          title='Snow Depth (in)'
+          data={this.props.snwdData}
+          labels={this.props.snwdLabels}
+        />
+        <ChartWrapper
+          title='Snow Water Equivalent (in)'
+          data={this.props.wteqData}
+          labels={this.props.wteqLabels}
+        />
+        <ChartWrapper
+          title='Precipitation Accumulation (in)'
+          data={this.props.precData}
+          labels={this.props.precLabels}
+        />
       </div >
     )
 

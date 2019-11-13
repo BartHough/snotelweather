@@ -15,6 +15,17 @@ export class SnotelSite extends Component {
   getURL = () => {
     return 'https://wcc.sc.egov.usda.gov/reportGenerator/view/customSingleStationReport/daily/' + this.props.triplet + '/-7,0/WTEQ::value,SNWD::value,PREC::value,TOBS::value,TMAX::value,TMIN::value,TAVG::value'
   }
+  endRef = React.createRef()
+
+  componentDidMount () {
+    this.scrollToBottom()
+  }
+  componentDidUpdate () {
+    this.scrollToBottom()
+  }
+  scrollToBottom = () => {
+    this.endRef.current.scrollIntoView({ behavior: 'smooth' })
+  }
   render() {
     return (
       < div >

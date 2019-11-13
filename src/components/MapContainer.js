@@ -18,6 +18,10 @@ const style = {
     top: '10px',
     margin: 'auto'
   },
+  infoWindow: {
+    width: '50px',
+    height: '50px'
+  }
 }
 
 
@@ -30,6 +34,10 @@ export class MapContainer extends Component {
         lat: 41,
         lng: -108.3
       },
+      stationLoaction: {
+        lat: '',
+        lng: ''
+      },
       isVisible: false,
       loading: false,
       days: '',
@@ -38,8 +46,10 @@ export class MapContainer extends Component {
       elevation: '',
       triplet: '',
       wind: '',
-      stationLat: '',
-      stationLng: '',
+      sortedWind: {
+        sortedDir: [],
+        sortedSpeed: []
+      },
       tobsLabels: [],
       tobsData: [],
       precLabels: [],
@@ -47,17 +57,23 @@ export class MapContainer extends Component {
       snwdLabels: [],
       snwdData: [],
       wteqLabels: [],
-      wteqData: []
+      wteqData: [],
+      wspdxLabels: [],
+      wspdxData: [],
+      wdirLabels: [],
+      wdirData: []
     }
     this.handleChange = this.handleChange.bind(this)
 
   }
+  topRef = React.createRef();
 
   handleChange(event) {
     this.setState({ ...this.state, [event.target.name]: event.target.value })
   }
 
   async componentDidMount() {
+    this.viewTop();
     const { lat, lng } = await this.getcurrentLocation();
     this.setState(prev => ({
       ...prev,
@@ -90,6 +106,7 @@ export class MapContainer extends Component {
       lng: 0
     };
   }
+
   callAPI = (event) => {
     this.setState({
       ...this.state,
@@ -104,51 +121,90 @@ export class MapContainer extends Component {
         this.extractInformation(data);
       });
   }
+
   extractInformation(data) {
     const stationName = data[0]['station_information']['name'];
     const distance = Math.round(data[0]['distance']);
     const elevation = data[0]['station_information']['elevation'];
-    const triplet = data[0]['station_information']['triplet']
-    const wind = data[0]['station_information']['wind']
-    const stationLat = data[0]['station_information']['location']['lat']
-    const stationLng = data[0]['station_information']['location']['lng']
-    const apiUrl = apiGatewayUrl + '?' + 'snotel=' + triplet + '&days=' + this.state.days
-    console.log(apiUrl)
+    const triplet = data[0]['station_information']['triplet'];
+    const wind = data[0]['station_information']['wind'];
+    const stationLat = data[0]['station_information']['location']['lat'];
+    const stationLng = data[0]['station_information']['location']['lng'];
+    const apiUrl = apiGatewayUrl + '?snotel=' + triplet + '&days=' + this.state.days;
     this.callApiGateway(apiUrl);
     const isVisible = true;
     const loading = false;
     this.setState({
       ...this.state,
+      stationLoaction: {
+        lat: stationLat,
+        lng: stationLng
+      },
       stationName,
       distance,
       elevation,
       triplet,
       wind,
-      stationLat,
-      stationLng,
       isVisible,
       loading
     })
   }
+
   callApiGateway(apiUrl) {
     // data comes in this order:
     // # TOBS = AIR TEMPERATURE OBSERVED
     // # PREC = PRECIPITATION ACCUMULATION
     // # SNWD = SNOW DEPTH
     // # WTEQ = SNOW WATER EQUIVALENT
+    // # WSPDX = WIND SPEED MAXIMUM
+    // # WDIRV = WIND DIRECTION AVERAGE
     fetch(apiUrl)
       .then(res => res.json())
       .then(apiData => {
-        let tobsLabels = apiData[0][0]
-        let tobsData = apiData[0][1]
-        let precLabels = apiData[1][0]
-        let precData = apiData[1][1]
-        let snwdLabels = apiData[2][0]
-        let snwdData = apiData[2][1]
-        let wteqLabels = apiData[3][0]
-        let wteqData = apiData[3][1]
+        const tobsLabels = apiData[0][0];
+        const tobsData = apiData[0][1];
+        const precLabels = apiData[1][0];
+        const precData = apiData[1][1];
+        const snwdLabels = apiData[2][0];
+        const snwdData = apiData[2][1];
+        const wteqLabels = apiData[3][0];
+        const wteqData = apiData[3][1];
+        const wspdxLabels = apiData[4][0];
+        const wspdxData = apiData[4][1];
+        const wdirLabels = apiData[5][0];
+        const wdirData = apiData[5][1];
+        let unprocessedData = [];
+        wspdxData.forEach((speed, index) => {
+          unprocessedData.push([wdirData[index], speed]);
+        })
+        unprocessedData.sort((a, b) => (a[0] > b[0]) ? 1 : -1);
+        let sortedSpeed = []
+        let sortedDir = []
+        unprocessedData.forEach(pair => {
+          sortedDir.push(pair[0])
+        });
+        const tempSet = new Set(sortedDir);
+        sortedDir = [...tempSet]
+        let i = 0;
+        sortedDir.forEach(dir => {
+          let max = -1;
+          while(unprocessedData[i][0] === dir) {
+            if(unprocessedData[i][1] > max) {
+              max = unprocessedData[i][1];
+            }
+            i++;
+            if(i === unprocessedData.length){
+              break;
+            }
+          }
+          sortedSpeed.push(max);
+        });
         this.setState({
           ...this.state,
+          sortedWind: {
+            sortedDir,
+            sortedSpeed
+          },
           tobsLabels,
           tobsData,
           precLabels,
@@ -157,21 +213,21 @@ export class MapContainer extends Component {
           snwdData,
           wteqLabels,
           wteqData,
-        })
-      })
+          wspdxLabels,
+          wspdxData,
+          wdirLabels,
+          wdirData
+        });
+      });
   }
+
   addMarker(location, map) {
-    this.setState({ ...this.state, latlng: { lat: location.lat(), lng: location.lng() } })
+    this.setState({ ...this.state, latlng: { lat: location.lat(), lng: location.lng() } });
     map.panTo(location);
-  };
-
-  topRef = React.createRef()
-
-  componentDidMount() {
-    this.viewTop()
   }
+
   viewTop = () => {
-    this.topRef.current.scrollIntoView({ behavior: 'smooth' })
+    this.topRef.current.scrollIntoView({ behavior: 'smooth' });
   }
 
 
@@ -220,6 +276,7 @@ export class MapContainer extends Component {
             <SnotelSite
               stationName={this.state.stationName}
               distance={this.state.distance}
+              triplet={this.state.triplet}
               tobsLabels={this.state.tobsLabels}
               tobsData={this.state.tobsData}
               precLabels={this.state.precLabels}
@@ -228,6 +285,14 @@ export class MapContainer extends Component {
               snwdData={this.state.snwdData}
               wteqLabels={this.state.wteqLabels}
               wteqData={this.state.wteqData}
+              wspdxLabels={this.state.wspdxLabels}
+              wspdxData={this.state.wspdxData}
+              wdirLabels={this.state.wdirLabels}
+              wdirData={this.state.wdirData}
+              sortedDir={this.state.sortedWind.sortedDir}
+              sortedSpeed={this.state.sortedWind.sortedSpeed}
+              wind={this.state.wind}
+              days={this.state.days}
             />}
         </Map>
       </div>

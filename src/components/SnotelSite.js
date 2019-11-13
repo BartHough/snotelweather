@@ -1,95 +1,9 @@
 import React, { Component } from 'react';
 import ChartWrapper from './ChartWrapper';
+import WindWrapper from './WindWrapper';
 import '../styles/SnotelSite.css';
 
 export class SnotelSite extends Component {
-  constructor(props) {
-    super(props);
-  }
-  getHeight() {
-    return {
-      labels: this.props.dates,
-      datasets: [
-        {
-          label: 'Snow Height (in)',
-          fill: false,
-          lineTension: 0.1,
-          backgroundColor: 'rgba(75,192,192,0.4)',
-          borderColor: 'rgba(75,192,192,1)',
-          borderCapStyle: 'butt',
-          borderDash: [],
-          borderDashOffset: 0.0,
-          borderJoinStyle: 'miter',
-          pointBorderColor: 'rgba(75,192,192,1)',
-          pointBackgroundColor: '#fff',
-          pointBorderWidth: 1,
-          pointHoverRadius: 5,
-          pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-          pointHoverBorderColor: 'rgba(220,220,220,1)',
-          pointHoverBorderWidth: 2,
-          pointRadius: 1,
-          pointHitRadius: 10,
-          data: this.props.snowDepth
-        }
-      ]
-    };
-  }
-  getSwe() {
-    return {
-      labels: this.props.dates,
-      datasets: [
-        {
-          label: 'Snow Water Equivalent (in)',
-          fill: false,
-          lineTension: 0.1,
-          backgroundColor: 'rgba(75,192,192,0.4)',
-          borderColor: 'rgba(75,192,192,1)',
-          borderCapStyle: 'butt',
-          borderDash: [],
-          borderDashOffset: 0.0,
-          borderJoinStyle: 'miter',
-          pointBorderColor: 'rgba(75,192,192,1)',
-          pointBackgroundColor: '#fff',
-          pointBorderWidth: 1,
-          pointHoverRadius: 5,
-          pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-          pointHoverBorderColor: 'rgba(220,220,220,1)',
-          pointHoverBorderWidth: 2,
-          pointRadius: 1,
-          pointHitRadius: 10,
-          data: this.props.swe
-        }
-      ]
-    };
-  }
-  getTemp() {
-    return {
-      labels: this.props.dates,
-      datasets: [
-        {
-          label: 'Observed Air Temp (F)',
-          fill: false,
-          lineTension: 0.1,
-          backgroundColor: 'rgba(75,192,192,0.4)',
-          borderColor: 'rgba(75,192,192,1)',
-          borderCapStyle: 'butt',
-          borderDash: [],
-          borderDashOffset: 0.0,
-          borderJoinStyle: 'miter',
-          pointBorderColor: 'rgba(75,192,192,1)',
-          pointBackgroundColor: '#fff',
-          pointBorderWidth: 1,
-          pointHoverRadius: 5,
-          pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-          pointHoverBorderColor: 'rgba(220,220,220,1)',
-          pointHoverBorderWidth: 2,
-          pointRadius: 1,
-          pointHitRadius: 10,
-          data: this.props.temp
-        }
-      ]
-    };
-  }
   scrollRef = React.createRef()
 
   componentDidMount() {
@@ -97,6 +11,9 @@ export class SnotelSite extends Component {
   }
   scrollToBottom = () => {
     this.scrollRef.current.scrollIntoView({ behavior: 'smooth' })
+  }
+  getURL = () => {
+    return 'https://wcc.sc.egov.usda.gov/reportGenerator/view/customSingleStationReport/daily/' + this.props.triplet + '/-7,0/WTEQ::value,SNWD::value,PREC::value,TOBS::value,TMAX::value,TMIN::value,TAVG::value'
   }
   render() {
     return (
@@ -108,7 +25,26 @@ export class SnotelSite extends Component {
           <h4 className='textDisplay'>
             Distance from Marker: {this.props.distance} miles
           </h4>
+          <h4 className='textDisplay'>
+            <a href={this.getURL()}>{this.props.stationName}</a>
+          </h4>
         </div>
+        {
+          this.props.wind &&
+          <WindWrapper
+            title={'Wind Speed and Direction Over Last ' + this.props.days + ' Days'}
+            speed={this.props.sortedSpeed}
+            direction={this.props.sortedDir}
+          />
+        }
+        {
+          this.props.wind &&
+          <ChartWrapper
+            title='Max Wind Speed (MPH)'
+            labels={this.props.wspdxLabels}
+            data={this.props.wspdxData}
+          />
+        }
         <ChartWrapper
           title='Observed Air Temperature (F)'
           data={this.props.tobsData}

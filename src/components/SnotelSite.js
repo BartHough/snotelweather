@@ -1,98 +1,19 @@
 import React, { Component } from 'react';
-import { Line } from 'react-chartjs-2';
-import '../styles/SnotelSite.css'
+import ChartWrapper from './ChartWrapper';
+import WindWrapper from './WindWrapper';
+import '../styles/SnotelSite.css';
 
 export class SnotelSite extends Component {
-  constructor(props) {
-    super(props);
-    this.getHeight = this.getHeight.bind(this);
-    this.getSwe = this.getSwe.bind(this);
-    this.getTemp = this.getTemp.bind(this);
+  scrollRef = React.createRef()
 
+  componentDidMount() {
+    this.scrollToBottom()
   }
-  getHeight() {
-    return {
-      labels: this.props.dates,
-      datasets: [
-        {
-          label: 'Snow Height (in)',
-          fill: false,
-          lineTension: 0.1,
-          backgroundColor: 'rgba(75,192,192,0.4)',
-          borderColor: 'rgba(75,192,192,1)',
-          borderCapStyle: 'butt',
-          borderDash: [],
-          borderDashOffset: 0.0,
-          borderJoinStyle: 'miter',
-          pointBorderColor: 'rgba(75,192,192,1)',
-          pointBackgroundColor: '#fff',
-          pointBorderWidth: 1,
-          pointHoverRadius: 5,
-          pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-          pointHoverBorderColor: 'rgba(220,220,220,1)',
-          pointHoverBorderWidth: 2,
-          pointRadius: 1,
-          pointHitRadius: 10,
-          data: this.props.snowDepth
-        }
-      ]
-    };
+  scrollToBottom = () => {
+    this.scrollRef.current.scrollIntoView({ behavior: 'smooth' })
   }
-  getSwe() {
-    return {
-      labels: this.props.dates,
-      datasets: [
-        {
-          label: 'Snow Water Equivalent (in)',
-          fill: false,
-          lineTension: 0.1,
-          backgroundColor: 'rgba(75,192,192,0.4)',
-          borderColor: 'rgba(75,192,192,1)',
-          borderCapStyle: 'butt',
-          borderDash: [],
-          borderDashOffset: 0.0,
-          borderJoinStyle: 'miter',
-          pointBorderColor: 'rgba(75,192,192,1)',
-          pointBackgroundColor: '#fff',
-          pointBorderWidth: 1,
-          pointHoverRadius: 5,
-          pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-          pointHoverBorderColor: 'rgba(220,220,220,1)',
-          pointHoverBorderWidth: 2,
-          pointRadius: 1,
-          pointHitRadius: 10,
-          data: this.props.swe
-        }
-      ]
-    };
-  }
-  getTemp() {
-    return {
-      labels: this.props.dates,
-      datasets: [
-        {
-          label: 'Observed Air Temp (F)',
-          fill: false,
-          lineTension: 0.1,
-          backgroundColor: 'rgba(75,192,192,0.4)',
-          borderColor: 'rgba(75,192,192,1)',
-          borderCapStyle: 'butt',
-          borderDash: [],
-          borderDashOffset: 0.0,
-          borderJoinStyle: 'miter',
-          pointBorderColor: 'rgba(75,192,192,1)',
-          pointBackgroundColor: '#fff',
-          pointBorderWidth: 1,
-          pointHoverRadius: 5,
-          pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-          pointHoverBorderColor: 'rgba(220,220,220,1)',
-          pointHoverBorderWidth: 2,
-          pointRadius: 1,
-          pointHitRadius: 10,
-          data: this.props.temp
-        }
-      ]
-    };
+  getURL = () => {
+    return 'https://wcc.sc.egov.usda.gov/reportGenerator/view/customSingleStationReport/daily/' + this.props.triplet + '/-7,0/WTEQ::value,SNWD::value,PREC::value,TOBS::value,TMAX::value,TMIN::value,TAVG::value'
   }
   endRef = React.createRef()
 
@@ -108,41 +29,53 @@ export class SnotelSite extends Component {
   render() {
     return (
       < div >
-        <div className='textContainer'>
+        <div className='textContainer' ref={this.scrollRef}>
           <h4 className='textDisplay'>
             Snotel Site: {this.props.stationName}
           </h4>
           <h4 className='textDisplay'>
             Distance from Marker: {this.props.distance} miles
           </h4>
+          <h4 className='textDisplay'>
+            <a href={this.getURL()}>{this.props.stationName}</a>
+          </h4>
         </div>
-        <div className='chartContainer' ref={this.endRef}>
-          <Line
-            data={this.getHeight()}
-            width={400}
-            height={400}
-            options={{ maintainAspectRatio: false }}
-            responsive={true}
+        {
+          this.props.wind &&
+          <WindWrapper
+            title={'Wind Speed and Direction Over Last ' + this.props.days + ' Days'}
+            speed={this.props.sortedSpeed}
+            direction={this.props.sortedDir}
           />
-        </div>
-        <div className='chartContainer'>
-          <Line
-            data={this.getSwe()}
-            width={400}
-            height={400}
-            options={{ maintainAspectRatio: false }}
-            responsive={true}
+        }
+        {
+          this.props.wind &&
+          <ChartWrapper
+            title='Max Wind Speed (MPH)'
+            labels={this.props.wspdxLabels}
+            data={this.props.wspdxData}
           />
-        </div>
-        <div className='chartContainer'>
-          <Line
-            data={this.getTemp()}
-            width={400}
-            height={400}
-            options={{ maintainAspectRatio: false }}
-            responsive={true}
-          />
-        </div>
+        }
+        <ChartWrapper
+          title='Observed Air Temperature (F)'
+          data={this.props.tobsData}
+          labels={this.props.tobsLabels}
+        />
+        <ChartWrapper
+          title='Snow Depth (in)'
+          data={this.props.snwdData}
+          labels={this.props.snwdLabels}
+        />
+        <ChartWrapper
+          title='Snow Water Equivalent (in)'
+          data={this.props.wteqData}
+          labels={this.props.wteqLabels}
+        />
+        <ChartWrapper
+          title='Precipitation Accumulation (in)'
+          data={this.props.precData}
+          labels={this.props.precLabels}
+        />
       </div >
     )
 

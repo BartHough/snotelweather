@@ -158,7 +158,7 @@ export class MapContainer extends Component {
     // # WTEQ = SNOW WATER EQUIVALENT
     // # WSPDX = WIND SPEED MAXIMUM
     // # WDIRV = WIND DIRECTION AVERAGE
-    fetch(apiUrl)
+    fetch(proxyUrl + apiUrl)
       .then(res => res.json())
       .then(apiData => {
         const tobsLabels = apiData[0][0];
@@ -188,12 +188,12 @@ export class MapContainer extends Component {
         let i = 0;
         sortedDir.forEach(dir => {
           let max = -1;
-          while(unprocessedData[i][0] === dir) {
-            if(unprocessedData[i][1] > max) {
+          while (unprocessedData[i][0] === dir) {
+            if (unprocessedData[i][1] > max) {
               max = unprocessedData[i][1];
             }
             i++;
-            if(i === unprocessedData.length){
+            if (i === unprocessedData.length) {
               break;
             }
           }

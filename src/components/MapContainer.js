@@ -158,7 +158,7 @@ export class MapContainer extends Component {
     // # WTEQ = SNOW WATER EQUIVALENT
     // # WSPDX = WIND SPEED MAXIMUM
     // # WDIRV = WIND DIRECTION AVERAGE
-    fetch(proxyUrl + apiUrl)
+    fetch(apiUrl)
       .then(res => res.json())
       .then(apiData => {
         const tobsLabels = apiData[0][0];

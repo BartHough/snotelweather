@@ -16,7 +16,7 @@
     "react-grid-system": "^5.0.2",
     "react-loader-spinner": "^3.1.4",
     "react-modal": "^3.10.1",
-    "react-native": "^0.61.2",
+    "react-native": "^0.62.3",
     "react-scripts": "3.2.0"
   },
   "scripts": {
